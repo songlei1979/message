@@ -5,6 +5,8 @@ from .models import ChatRoom
 from .serializers import ChatRoomSerializer
 from django.urls import reverse
 
+from .views import sumNumbers
+
 
 class ChatRoomViewSetTest(TestCase):
     @classmethod
@@ -48,3 +50,52 @@ class ChatRoomViewSetTest(TestCase):
         response = self.client.delete(reverse('chatroom-detail', kwargs={'pk': self.chatroom1.pk}))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(ChatRoom.objects.count(), 1)
+
+
+class SumNumbersFunctionTest(TestCase):
+
+    def test_positive_range(self):
+        result = sumNumbers(1, 5)
+        self.assertEqual(result, 15)
+
+    def test_reverse_range(self):
+        result = sumNumbers(5, 1)
+        self.assertEqual(result, 15)
+
+    def test_negative_range(self):
+        result = sumNumbers(-3, 3)
+        self.assertEqual(result, 0)
+
+    def test_single_number(self):
+        result = sumNumbers(5, 5)
+        self.assertEqual(result, 5)
+
+    def test_zero_range(self):
+        result = sumNumbers(0, 0)
+        self.assertEqual(result, 0)
+
+
+class SumNumbersViewTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.url = reverse('sum_numbers')
+
+    def test_sum_numbers(self):
+        response = self.client.post(self.url, {'start_num': 1, 'end_num': 5})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['result'], 15)
+
+    def test_sum_numbers_reverse_order(self):
+        response = self.client.post(self.url, {'start_num': 5, 'end_num': 1})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['result'], 15)
+
+    def test_sum_numbers_negative(self):
+        response = self.client.post(self.url, {'start_num': -3, 'end_num': 3})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['result'], 0)
+
+    def test_sum_numbers_missing_params(self):
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['result'], 0)
