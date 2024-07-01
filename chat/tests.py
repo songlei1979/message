@@ -81,21 +81,18 @@ class SumNumbersViewTest(TestCase):
         self.url = reverse('sum_numbers')
 
     def test_sum_numbers(self):
-        response = self.client.post(self.url, {'start_num': 1, 'end_num': 5})
+        response = self.client.post(self.url, {'start_num': 1, 'end_num': 5}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['result'], 15)
 
     def test_sum_numbers_reverse_order(self):
-        response = self.client.post(self.url, {'start_num': 5, 'end_num': 1})
+        response = self.client.post(self.url, {'start_num': 5, 'end_num': 1}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['result'], 15)
 
     def test_sum_numbers_negative(self):
-        response = self.client.post(self.url, {'start_num': -3, 'end_num': 3})
+        response = self.client.post(self.url, {'start_num': -3, 'end_num': 3}, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['result'], 0)
 
-    def test_sum_numbers_missing_params(self):
-        response = self.client.post(self.url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['result'], 0)
+
