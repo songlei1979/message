@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
@@ -10,13 +11,15 @@ from .views import sumNumbers
 
 class ChatRoomViewSetTest(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(self):
         # Set up data for the whole TestCase
-        cls.chatroom1 = ChatRoom.objects.create(name='Test Room 1')
-        cls.chatroom2 = ChatRoom.objects.create(name='Test Room 2')
+        self.chatroom1 = ChatRoom.objects.create(name='Test Room 1')
+        self.chatroom2 = ChatRoom.objects.create(name='Test Room 2')
 
     def setUp(self):
         self.client = APIClient()
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.client.login(username='testuser', password='testpassword')
 
     def test_list_chatrooms(self):
         response = self.client.get(reverse('chatroom-list'))
